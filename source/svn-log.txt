@@ -1,0 +1,64 @@
+------------------------------------------------------------------------
+r9 | andrew | 2025-01-12 16:36:11 +1100 (Sun, 12 Jan 2025) | 1 line
+
+Fixed compiler errors and typo's in commonui.pas and imgedit.pas
+------------------------------------------------------------------------
+r8 | andrew | 2025-01-12 16:25:30 +1100 (Sun, 12 Jan 2025) | 3 lines
+
+More work on the image editor
+- changed max size to 200x200 (will need to make it possible to make rectangular sized images)
+- added export to GFX, recursiveFill and randomFill functions
+------------------------------------------------------------------------
+r7 | andrew | 2025-01-11 16:43:28 +1100 (Sat, 11 Jan 2025) | 3 lines
+
+Made import functions for the image editor for both gfx files and vga (qbasic) files.
+
+Added a title feature to the menu common ui.
+------------------------------------------------------------------------
+r6 | andrew | 2025-01-11 13:11:00 +1100 (Sat, 11 Jan 2025) | 3 lines
+
+I've added some new functions to the common ui unit for a simple menu and help display.
+
+This should be all the common ui elements needed now, so I should be able to work on the image editor and the pack editor.
+------------------------------------------------------------------------
+r5 | andrew | 2025-01-10 12:40:00 +1100 (Fri, 10 Jan 2025) | 7 lines
+
+Started work on the image editor portion of the gedit program.
+- made an undo buffer 10 items long and procedures to add to it and undo one layer.
+- made some basic functions such as double size, mirror and rotate. more to come.
+- made a palette to make colour selection a bit easier if you re-use any.
+- still need to make the main loop for doing the editing.
+
+removed a TPU file from the repo, other than graph.tpu these should not be in the repo.
+------------------------------------------------------------------------
+r4 | andrew | 2025-01-07 13:21:36 +1100 (Tue, 07 Jan 2025) | 3 lines
+
+Made a new file selection mechanism in common ui and a minor bugfix in pgs
+
+
+------------------------------------------------------------------------
+r3 | andrew | 2025-01-04 12:24:45 +1100 (Sat, 04 Jan 2025) | 3 lines
+
+Made a new unit to contain common ui elements for the graphical editor.
+- also added some editiing functions to PGS to facilitate making and editing packs of graphics.
+
+------------------------------------------------------------------------
+r2 | andrew | 2025-01-02 12:53:07 +1100 (Thu, 02 Jan 2025) | 9 lines
+
+Made some changes in preparation for building the new graphic editor
+- added get pixel function to VGA unit
+- added functions to add/remove/replace images in PGS
+- modified bfont to use VGA line drawing
+- modifed egaconv and cgaconv to use new get pixel function in VGA
+- modified defines to reflect this project only using VGA
+- created a simple compile batch file.
+
+
+------------------------------------------------------------------------
+r1 | andrew | 2025-01-01 17:30:53 +1100 (Wed, 01 Jan 2025) | 4 lines
+
+Initial commit - contains relevant source and binary files for begining development of a better graphical editor for my packed graphics files.
+These files come from the Bobsfury reposity at rev 194, but will be modified for this new project.
+
+
+------------------------------------------------------------------------
