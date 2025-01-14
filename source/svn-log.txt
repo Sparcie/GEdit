@@ -1,4 +1,17 @@
 ------------------------------------------------------------------------
+r11 | andrew | 2025-01-14 18:25:00 +1100 (Tue, 14 Jan 2025) | 3 lines
+
+Began work on the main loop for the image editor. created the basics of the loop and an exit menu to confirm whether the user wants to quit and if they want to save the image.
+
+Still needs some more work before I can do any testing.
+------------------------------------------------------------------------
+r10 | andrew | 2025-01-14 00:18:31 +1100 (Tue, 14 Jan 2025) | 4 lines
+
+I've re-written the pick size routine to allow for rectangular sizes
+and have added a circle function to the image editor.
+
+Still some way to go!
+------------------------------------------------------------------------
 r9 | andrew | 2025-01-12 16:36:11 +1100 (Sun, 12 Jan 2025) | 1 line
 
 Fixed compiler errors and typo's in commonui.pas and imgedit.pas
