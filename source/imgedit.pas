@@ -13,6 +13,9 @@ unit imgedit;
 
 interface
 
+{ edit an image - this presumes that it is currently drawn on screen }
+{ returns true if user chooses to save changes }
+function editImg(sizex, sizey : word):boolean;
 
 implementation
 
@@ -338,6 +341,175 @@ begin
 	 putpixel(cx,cy,col[random(count)]);
    pc:= getpixel(x,y);
 end;
+
+procedure circle;
+var radius : word;
+   c	   : char;
+   done	   : boolean;
+begin
+   {make undo...}
+   refreshUndo;
+   copyToBuffer;
+   radius := 10;
+   done:= false;
+
+   while (not(done)) do
+   begin
+      {refresh display }
+      copySegment(0,0,sx,sy, false);
+      vga.circle(x,y,radius, pal[cc]);
+
+      while not(keypressed) do;
+
+      c:= readkey;
+
+      if c = chr(27) then
+      begin
+	 {escape pressed}
+	 copyToScreen; {undo any drawing}
+	 done:= true;
+      end;
+      if c=chr(13) then done:=true; { enter pressed - stick with the what is on screen }
+      if c=chr(0) then
+      begin
+	 c := readkey;
+	 if ((c=chr(72)) and (radius>0)) then dec(radius);
+	 if ((c=chr(80)) and (radius<200)) then inc(radius);
+      end;
+   end;
+end;
+
+{returns 0 for exit menu (resume editng)
+ 1 for exit and save image
+ 2 for exit and discard image
+}
+function exitMenu:byte;
+var m : menudata;
+   r  : byte;
+begin
+   m.title := 'Save edited image?';
+   m.items[1] := 'Save and Exit';
+   m.items[2] := 'Discard and Exit';
+   m.items[3] := 'Resume editing';
+   m.count:=3;
+   r:= menu(m);
+   if r=3 then r:=0; {they are the same result}
+   exitMenu:=r;
+end;
+
+procedure extendedKeys;
+var
+   c : char;
+begin
+   c:= readkey;
+   case c of
+     chr(72) : if y>0 then dec(y);
+     chr(80) : if y<sy-1 then inc(y);
+     chr(75) : if x>0 then dec(x);
+     chr(77) : if x<sx-1 then inc(x);
+   end;
+end;
+
+{ edit an image - this presumes that it is currently drawn on screen }
+{ This is where the main loop of the image editor resides. }
+{returns true is user chose to save changes }
+function editImg(sizex, sizey : word):boolean;
+var
+   c	: char;
+   done	: boolean;
+   r	: byte;
+begin
+   {load the undo buffer with the starting image}
+   refreshUndo;
+
+   {default is to assume the image will be saved - just in case}
+   editImg := true;
+
+   {set up initial values for start position}
+   x:=0; y:=0;
+   pc := getPixel(0,0);
+
+   {draw the palette}
+   drawPal;
+
+   { main loop }
+   while not(done) do
+   begin
+      while not(keypressed) do;
+      putPixel(x,y,pc);
+
+      c:= readkey;
+      c:= upcase(c);
+
+      case c of
+	{ arrow keys and other extended keys}
+	chr(0) : extendedKeys;
+	{special functions}
+	'U'    : useUndo;
+	'I'    : import;
+	'X'    : exportGFX;
+	'R'    : rotate;
+	'M'    : mirror;
+	'D'    : double;
+       
+	{Palette and colour selection}
+	'1'    : cc := 0;
+	'2'    : cc := 1;
+	'3'    : cc := 2;
+	'4'    : cc := 3;
+	'5'    : cc := 4;
+	'6'    : cc := 5;
+	'7'    : cc := 6;
+	'8'    : cc := 7;
+	'9'    : cc := 8;
+	'0'    : cc := 9;
+	'P'    : pal[cc] := pickColor;
+	','    : if cc>0 then dec(cc);
+	'.'    : if cc<9 then inc(cc);
+	'G'    : pal[cc] := pc;
+
+	{Quit options}
+	chr(27),'Q' : begin
+	   r:= exitMenu;
+	   {option 0 does nothing! continue!}
+	   if r= 1 then
+	   begin
+	      {save and exit!}
+	      editImg := true; {just in case}
+	      done:= true;
+	   end;
+	   if r= 2 then
+	   begin
+	      {discard and exit!}
+	      editImg := false; 
+	      done:= true;
+	   end;
+	end;
+	
+      end;
+      
+
+      
+      pc:= getPixel(x,y);
+      putPixel(x,y,15 xor pc);
+      line(sx,0,sx,sy,7);
+      line(0,sy,sx,sy,7);
+      drawPal;
+   end;
+   putPixel(x,y,pc);
+   
+   {we're done we need to clean-up }
+   { clear the undo buffer so that memory is freed correctly and there isn't contamination
+    with the next image edited }
+   for undoPos:= 0 to 9 do
+      if undoSize[undoPos] > 0 then
+      begin
+	 freemem(undo[undoPos], undoSize[undoPos]);
+	 undoSize[undoPos] := 0;
+      end;
+end;
+
+    
 
 begin
    for cc := 0 to 9 do

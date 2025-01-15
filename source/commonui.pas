@@ -29,7 +29,7 @@ function ginput(x,y:integer):string;
 {basic ui to select a colour}
 function pickcolor:byte;
 {basic ui to select a square size}
-function pickSize:byte;
+procedure pickSize(var sizex, sizey :byte);
 { file selector dialog, you can specify the extention and whether we are writing to the file.}
 function fileSelector( ext:string; wr:boolean):string;
 { simple menu function - you specify the menu, returns the index if a selection is made 0 for cancel }
@@ -291,50 +291,60 @@ begin
 end;
 
 
-function pickSize:byte;
-var size:byte;
-    c : char;
-    s: string;
+procedure pickSize(var sizex, sizey :byte);
+var c	 : char;
+    s,t	 : string;
     done : boolean;
 begin
-    copyToBuffer;
-    size:=10;
-    line(size,0,size,size,15);
-    line(0,size,size,size,15);
-    str(size,s);
-    s := 'Size: '+s;
-    textxy(size,size,4,9,s);
-    done := false;
-    while not(done) do
-    begin
-        while not(keypressed) do ;
-        c := readkey;
+   copyToBuffer;
+   sizex:=10;
+   sizey:=10;
+   line(sizex,0,sizex,sizey,15);
+   line(0,sizey,sizex,sizey,15);
+   str(sizex,s);
+   t := 'Size: '+s;
+   str(sizey,s);
+   t:= t + ',' +s;
+   textxy(sizex,sizey,4,9,s);
+   
+   done := false;
+   while not(done) do
+   begin
+      while not(keypressed) do;
+      c := readkey;
+      
+      line(sizex,0,sizex,sizey,0);
+      line(0,sizey,sizex,sizey,0);
+      str(sizex,s);
+      t := 'Size: '+s;
+      str(sizey,s);
+      t:= t + ',' +s;
+      textxy(sizex,sizey,4,0,s);        
         
-        line(size,0,size,size,0);
-        line(0,size,size,size,0);
-        str(size,s);
-        s := 'Size: '+s;
-        textxy(size,size,4,0,s);
-        
-        if c='.' then inc(size);
-        if c=',' then dec(size);
-        if c='>' then size:=size + 10;
-        if c='<' then size:=size - 10;
-        
-        if size < 1 then size := 1;
-        if size >200 then size := 200; 
-        {this upper limit could be bigger, but I don't think you'd want to load alot of images bigger than that.}
-        
-        if c = chr(13) then done:=true;
-        
-        line(size,0,size,size,15);
-        line(0,size,size,size,15);
-        str(size,s);
-        s := 'Size: '+s;
-        textxy(size,size,4,9,s);
-    end;
-    pickSize:= size;
-    copyToScreen;
+      if c = chr(13) then done:=true;
+      if c = chr(0) then
+      begin
+	 if ((c=chr(72)) and (sizey>1)) then dec(sizey);
+	 if ((c=chr(80)) and (sizey<200)) then inc(sizey);
+	 if ((c=chr(75)) and (sizex>1)) then dec(sizex);
+	 if ((c=chr(77)) and (sizex<320)) then inc(sizex);
+
+	 {faster keys}
+	 if ((c=chr(73)) and (sizey>11)) then sizey := sizey-10;
+	 if ((c=chr(81)) and (sizey<189)) then sizey := sizey+10;;
+	 if ((c=chr(71)) and (sizex>11)) then sizex := sizex-10;
+	 if ((c=chr(79)) and (sizex<309)) then sizex:= sizex+10;
+      end;
+
+      line(sizex,0,sizex,sizey,15);
+      line(0,sizey,sizex,sizey,15);
+      str(sizex,s);
+      t := 'Size: '+s;
+      str(sizey,s);
+      t:= t + ',' +s;
+      textxy(sizex,sizey,4,9,s);
+   end;
+   copyToScreen;
 end;
 
 function pickcolor:byte;
