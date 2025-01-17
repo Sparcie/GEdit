@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+r13 | andrew | 2025-01-17 19:11:52 +1100 (Fri, 17 Jan 2025) | 1 line
+
+Fixed problems with image doubling and rotating functions.
+------------------------------------------------------------------------
+r12 | andrew | 2025-01-17 00:15:01 +1100 (Fri, 17 Jan 2025) | 7 lines
+
+Made significant progress - initial testing of image editor.
+- extended the undo buffer.
+- made some more interface functions on imgedit.pas so the external code can run it, save and load images and clear undo buffer.
+- fixed some problems with the commonui functions.
+- made the basics of the main program, only having the image editor so far.
+
+There are still some issues with the user interface that need addressing and some drawing functions such as mirror and double are broken. also the circle function in VGA seems to not function correctly. The other editors still need to be built.
+------------------------------------------------------------------------
 r11 | andrew | 2025-01-14 18:25:00 +1100 (Tue, 14 Jan 2025) | 3 lines
 
 Began work on the main loop for the image editor. created the basics of the loop and an exit menu to confirm whether the user wants to quit and if they want to save the image.

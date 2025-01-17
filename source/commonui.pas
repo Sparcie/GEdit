@@ -29,7 +29,7 @@ function ginput(x,y:integer):string;
 {basic ui to select a colour}
 function pickcolor:byte;
 {basic ui to select a square size}
-procedure pickSize(var sizex, sizey :byte);
+procedure pickSize(var sizex, sizey :word);
 { file selector dialog, you can specify the extention and whether we are writing to the file.}
 function fileSelector( ext:string; wr:boolean):string;
 { simple menu function - you specify the menu, returns the index if a selection is made 0 for cancel }
@@ -95,8 +95,8 @@ begin
 	 begin
 	    c:= readkey;
 
-	    if ((c = chr(75)) and (selection > 1)) then dec(selection);
-	    if ((c = chr(77)) and (selection < count)) then inc(selection);	    
+	    if ((c = chr(72)) and (selection > 1)) then dec(selection);
+	    if ((c = chr(80)) and (selection < count)) then inc(selection);	    
 	 end;	 
       end;
    end;
@@ -291,7 +291,7 @@ begin
 end;
 
 
-procedure pickSize(var sizex, sizey :byte);
+procedure pickSize(var sizex, sizey :word);
 var c	 : char;
     s,t	 : string;
     done : boolean;
@@ -324,6 +324,7 @@ begin
       if c = chr(13) then done:=true;
       if c = chr(0) then
       begin
+	 c:=readkey;
 	 if ((c=chr(72)) and (sizey>1)) then dec(sizey);
 	 if ((c=chr(80)) and (sizey<200)) then inc(sizey);
 	 if ((c=chr(75)) and (sizex>1)) then dec(sizex);
@@ -357,12 +358,12 @@ begin
    copyToBuffer;
    for i:= 0 to 255 do
    begin
-      line(i,190,i,200,i);
+      line(i,190,i,199,i);
    end;
    c:=0;
    putpixel(c,189,15);
    textxy(280,190,4,15,'0'); 
-   textxy(10,180,4,15,'Select colour');
+   textxy(10,170,4,15,'Select colour');
    d:=false;
    while not(d) do
    begin
@@ -379,7 +380,7 @@ begin
       if c>255 then c:=0;
       if a=char(13) then d:=true;
       putpixel(c,189,15);
-      filledBox(260,190,270,200,c);
+      filledBox(260,190,270,199,c);
       str(c,s);
       textxy(280,190,4,15,s); 
    end;
