@@ -295,7 +295,9 @@ end;
 { new function for the graphical editor - to get a colour of a pixel }
 function getPixel( x,y :word):byte;
 begin
-    getPixel := mem[targseg: targofs + x + (y*320)];
+   getPixel:=0;
+   if checkBounds(x,y) then exit;
+   getPixel := mem[targseg: targofs + x + (y*320)];
 end;
 
 {basic blitting stuff - get and put in gwbasic terms}

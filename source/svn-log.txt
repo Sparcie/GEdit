@@ -1,4 +1,9 @@
 ------------------------------------------------------------------------
+r14 | andrew | 2025-01-18 21:08:45 +1100 (Sat, 18 Jan 2025) | 2 lines
+
+- Added bounds checking to getPixel
+- found I hadn't completely fixed the image double size routine and fixed that
+------------------------------------------------------------------------
 r13 | andrew | 2025-01-17 19:11:52 +1100 (Fri, 17 Jan 2025) | 1 line
 
 Fixed problems with image doubling and rotating functions.

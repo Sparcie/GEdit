@@ -101,6 +101,8 @@ procedure useUndo;
 begin
    if undoSize[undoPos] = 0 then exit; {exit if there is no image}
 
+   filledBox(0,0,sx,sy,0);
+
    putimage(0,0,undo[undoPos]);
 
    { restore image size in case it changed the size  - stored in the image }
@@ -151,7 +153,7 @@ begin
       begin
 	 z:=(i*2);
 	 w:=(c*2);
-	 a:= getpixel((sx+9)+i,c);
+	 a:= getpixel((sx+10)+i,c);
 	 putpixel(z,w,a);
 	 putpixel(z+1,w,a);
 	 putpixel(z,w+1,a);
@@ -159,9 +161,6 @@ begin
       end;
    sx:=sx*2;
    sy:=sy*2;  
-
-   {copy the doubled image to working area}
-   copyImg(100,0,sx,sy,0,0);
 
    {switch back to the screen an update the image}
    if setDrawMode(2) then copySegment(0,0,sx,sy,false);
@@ -410,7 +409,7 @@ begin
       if c=chr(0) then
       begin
 	 c := readkey;
-	 if ((c=chr(72)) and (radius>1)) then dec(radius);
+	 if ((c=chr(72)) and (radius>4)) then dec(radius);
 	 if ((c=chr(80)) and (radius<200)) then inc(radius);
       end;
    end;
