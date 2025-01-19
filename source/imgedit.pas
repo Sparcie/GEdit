@@ -82,6 +82,8 @@ end;
 
 {adds an image to the undo buffer}
 procedure refreshUndo;
+var
+   pos : byte;
 begin
    putpixel(x,y,pc);
    
@@ -91,7 +93,27 @@ begin
    if undoSize[undoPos]>0 then freemem(undo[undoPos], undoSize[undoPos]); {free memory if needed}
 
    {get new undo img}
-   undoSize[undoPos] := imageSize(sx,sy); 
+   undoSize[undoPos] := imageSize(sx,sy);
+   {check we have enough memory}
+   if undoSize[undoPos] > maxavail then
+   begin {we need to free the oldest image!}
+      pos:= undoPos;
+      while ((undoSize[pos] > 0) and (pos <> undoPos)) do
+      begin
+	 dec(pos);
+	 if pos>39 then pos:=39;
+      end;
+      {pos will be at the start - it's the slot available before the begining of the buffer }
+      {move forward to where the first item should be}
+      pos := (pos+1) mod 40; {this will wrap around if needed}
+      {free the slot as long as it has data in it.}
+      if undoSize[pos] > 0 then
+      begin
+	 freemem(undo[pos],undoSize[pos]);
+	 undoSize[pos] := 0;
+      end;
+   end;
+   
    getmem(undo[undoPos], undoSize[undoPos]);
    getImage(0,0,sx-1,sy-1, undo[undoPos]);
 end;
@@ -137,7 +159,7 @@ end;
 procedure double;
 var i,c,z,w,a : integer;
 begin
-   if ((sx>100) or (sy>100)) then exit;
+   if ((sx>140) or (sy>100)) then exit;
 
    refreshUndo;
 
@@ -172,6 +194,7 @@ end; { double }
 procedure mirror;
 var i,c,p : byte;
 begin
+   if sx>150 then exit; { we don't have room to work on an image bigger than this }
    refreshUndo;
 
    {use the back buffer as scratch space}
@@ -199,6 +222,7 @@ var
    i,c,p : byte;
    
 begin
+   if sx > 150 then exit; { we don't have room to work on an image bigger than this!}
    refreshUndo;
 
    {use the back buffer as scratch space}
@@ -234,6 +258,7 @@ var
 begin
    refreshUndo;
    f := fileSelector('vga', false);
+   if f='' then exit;
    inf.open(f);
    for c:= 0 to 9 do
       for i:= 0 to 9 do
@@ -258,6 +283,7 @@ var
 begin
    refreshUndo;
    f := fileSelector('gfx',false);
+   if f='' then exit;
    b.open(f);
    sx := ord(b.readchar);
    sy := ord(b.readchar);
@@ -293,6 +319,7 @@ var
    cx,cy : word;
 begin
    f:= fileSelector('gfx',true);
+   if f = '' then exit;
    putpixel(x,y,pc);
    w.open(f);
    w.writeChar(chr(sx));
@@ -303,8 +330,14 @@ begin
    w.close;
 end;
 
-procedure recursiveFill(cx,cy : integer; dc, cr: byte);
+procedure recursiveFill(cx,cy : integer; dc, cr: byte; depth:word);
+var dx	 : integer; {delta x}
+   stx,enx : integer; {start and end of a row}
+   c	 : byte;
+   done	 : boolean;
 begin
+   {check we haven't gone too deep}
+   if depth>2000 then exit;
    {check we are still in bounds}
    if cx<0 then exit;
    if cy<0 then exit;
@@ -317,11 +350,46 @@ begin
    {ok we have done the base checks we can replace the current pixel}
    putpixel(cx,cy,dc);
 
-   {recursively check neighboring pixels}
-   recursiveFill(cx+1,cy,dc,cr);
-   recursiveFill(cx-1,cy,dc,cr);
-   recursiveFill(cx,cy-1,dc,cr);
-   recursiveFill(cx,cy+1,dc,cr);
+   {fill out the entire row to the left}
+   done:=false;
+   dx := 1;
+   stx:=cx;
+   while ((cx - dx>-1) and not(done)) do
+   begin
+      c := getPixel(cx - dx,cy);
+      if ((c <> cr) or (c=dc)) then
+	 done:= true
+      else
+      begin
+	 putpixel(cx-dx,cy,dc);
+	 stx := cx-dx;
+	 inc(dx);
+      end;
+   end;
+
+   {fill out the entire row to the right}
+   done:=false;
+   dx := 1;
+   enx := cx;
+   while ((cx + dx < sx) and not(done)) do
+   begin
+      c := getPixel(cx + dx,cy);
+      if ((c <> cr) or (c=dc)) then
+	 done:= true
+      else
+      begin
+	 putpixel(cx+dx,cy,dc);
+	 enx := cx + dx;
+	 inc(dx);
+      end;
+   end;
+
+   for dx := stx to enx do
+   begin
+	 {recursively check neighboring pixels}
+	 recursiveFill(dx,cy-1,dc,cr, depth+1);
+	 recursiveFill(dx,cy+1,dc,cr, depth+1);
+   end;
 end;
 
 procedure randomFill;
@@ -433,6 +501,52 @@ begin
    exitMenu:=r;
 end;
 
+procedure imageInfo;
+var
+   s,t	   : string;
+   c	   : char;
+   i,count : byte;
+   
+begin
+   copyToBuffer;
+
+   filledbox(70,0,250,199,0);
+   line(70,0,70,199,7);
+   line(250,0,250,199,7);
+
+   str(sx,s);
+   t:= 'Image size: '+s+' x ';
+   str(sy,s);
+   t:= t + s;
+   textxy(80,20,4,9,t);
+   
+   t:='Available memory :';
+   str(memavail,s);
+   t:= t +s;
+   textxy(80,40,4,9,t);
+
+   t:='Largest block :';
+   str(maxavail,s);
+   t:=t+s;
+   textxy(80,50,4,9,t);
+
+   count:=0;
+   for i:= 0 to 39 do
+      if undoSize[i]>0 then inc(count);
+
+   t:= 'Undo buffer :';
+   str(count,s);
+   t:=t+s;
+   textxy(80,70,4,9,t);
+
+   while not(keypressed) do;
+
+   c:= readkey;
+   if c = chr(0) then c:= readkey;
+
+   copyToScreen;
+end;
+
 { a menu for activating special functions such as random fill, import/export etc}
 procedure specialFunctionMenu;
 var
@@ -446,7 +560,8 @@ begin
    m.items[4]:= 'Vertical Mirror';
    m.items[5]:= 'Double Size';
    m.items[6]:= 'Randomise';
-   m.count:=6;
+   m.items[7]:= 'Image info';
+   m.count:=7;
    r := menu(m);
 
    case r of
@@ -456,6 +571,7 @@ begin
      4 : mirror;
      5 : double;
      6 : randomFill;
+     7 : imageInfo;
    end;   
 end;
 
@@ -495,7 +611,10 @@ begin
 	    end;
 	 end;
      3 : circle;
-     4 : recursiveFill(x,y,pal[cc],getpixel(x,y));
+     4 : begin
+	    refreshUndo;
+	    recursiveFill(x,y,pal[cc],getpixel(x,y),1);
+	 end;
    end;	
 end;
 
@@ -523,9 +642,6 @@ var
    done	: boolean;
    r	: byte;
 begin
-   {load the undo buffer with the starting image}
-   refreshUndo;
-
    {default is to assume the image will be saved - just in case}
    editImg := true;
 
@@ -540,6 +656,9 @@ begin
    {draw the palette}
    drawPal;
    done:=false;
+
+   {load the undo buffer with the starting image}
+   refreshUndo;
 
    { main loop }
    while not(done) do

@@ -1,4 +1,19 @@
 ------------------------------------------------------------------------
+r16 | andrew | 2025-01-19 19:01:14 +1100 (Sun, 19 Jan 2025) | 1 line
+
+- fixed file selector for the instance where there are no files to load.
+------------------------------------------------------------------------
+r15 | andrew | 2025-01-19 17:07:05 +1100 (Sun, 19 Jan 2025) | 8 lines
+
+- fixed pick size function to show x and y sizes
+- fixed running out of memory when adding a new undo entry to the buffer - we remove the oldest when low on memory.
+- put size limits on functions (such as rotate etc) where room in the back buffer is needed
+- fixed behaviour of import/export when file selector is cancelled.
+- reworked recursiveFill as it would stack overflow - had to come up with something that would use less stack space.
+- created imageInfo to provide basic size information about the image and information about memory and the undo buffer.
+- load the starting image into the undo buffer.
+- fixed circle drawing where circle may hit edge of the screen.
+------------------------------------------------------------------------
 r14 | andrew | 2025-01-18 21:08:45 +1100 (Sat, 18 Jan 2025) | 2 lines
 
 - Added bounds checking to getPixel

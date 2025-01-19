@@ -574,14 +574,17 @@ begin
               {new aspect correction now changes the y value}
               {also uses 4:3 aspect ratio}
               {now also includes calculation for memory ofset}
-              af:= ((a * 3) div 4) * 320 ;
-              bf:= ((b * 3) div 4) * 320 ;
+              af:= ((a * 3) div 4);
+              bf:= ((b * 3) div 4);
               yofs := (y * 320) + targofs ;
-
+	      
               {optimise the drawing with asm if not going off the screen}
 	      if not(clip) then
-              asm
-                 {set up the es:di initial value}
+	      begin
+		 af:= af * 320;
+		 bf:= bf * 320;
+		 asm
+		 {set up the es:di initial value}
                  mov ax, targseg
                  mov es, ax
                  mov ax, x
@@ -631,10 +634,12 @@ begin
                  add di, dx
                  sub di, af
                  mov [es:di],al
-              end;
+	         end;
+	      end;
 
 	      if clip then
 	      begin
+		 {convert these back to screen co-ords}
 		 putpixel(x+a,y+bf,colour);
 		 putpixel(x+b,y+af,colour);
 		 putpixel(x-a,y+bf,colour);

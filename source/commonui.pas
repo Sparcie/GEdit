@@ -185,7 +185,11 @@ begin
        end;
        FindNext(DirInfo);
     end;
-    
+
+    {check if there were no files found }
+    fileSelector := '';
+    if ((count=0) and not(wr)) then exit;
+   
     {Ok now we can do a file selection dialog box with the info we have}
     
     pge := 0;
@@ -305,7 +309,7 @@ begin
    t := 'Size: '+s;
    str(sizey,s);
    t:= t + ',' +s;
-   textxy(sizex,sizey,4,9,s);
+   textxy(sizex,sizey,4,9,t);
    
    done := false;
    while not(done) do
@@ -319,7 +323,7 @@ begin
       t := 'Size: '+s;
       str(sizey,s);
       t:= t + ',' +s;
-      textxy(sizex,sizey,4,0,s);        
+      textxy(sizex,sizey,4,0,t);        
         
       if c = chr(13) then done:=true;
       if c = chr(0) then
@@ -343,7 +347,7 @@ begin
       t := 'Size: '+s;
       str(sizey,s);
       t:= t + ',' +s;
-      textxy(sizex,sizey,4,9,s);
+      textxy(sizex,sizey,4,9,t);
    end;
    copyToScreen;
 end;
