@@ -39,6 +39,7 @@ var
    undoSize : array[0..39] of word;    {size of the undo image - 0 means no image.}
    undoPos  : integer; {the current undo image}
    tool	    : byte; {current tool selected 0 - point 1 - line 2 - circle 3 - fill}
+   contdraw : boolean; {continuous drawing for pixel tool }
    lnx,lny  : word; {co-ordinate for line drawing - x is set to $FFFF if first co-ordinate has not been selected}
 
 const
@@ -60,6 +61,18 @@ begin
 	 freemem(undo[undoPos], undoSize[undoPos]);
 	 undoSize[undoPos] := 0;
       end;
+end;
+
+procedure drawCurrentTool;
+var
+   s : string;
+begin
+   s:= toolName[tool];
+   if ((tool=1) or (tool=2)) then
+      if contdraw then
+	 s:= 'Continuous ' + s;
+   filledBox(187,190,319,199,0);
+   textxy(187,190,4,9,s);	 
 end;
 
 { updates the current palette display on screen }
@@ -588,6 +601,7 @@ begin
    r:= menu(m);
    if r=0 then exit;
    tool := r;
+   drawCurrentTool;
 end;
 
 procedure useTool;
@@ -608,6 +622,11 @@ begin
 	       refreshUndo;
 	       line(lnx,lny,x,y,pal[cc]);
 	       lnx:= $FFFF;
+	       if contdraw then
+	       begin
+		  lnx:=x;
+		  lny:=y;
+	       end;
 	    end;
 	 end;
      3 : circle;
@@ -650,11 +669,13 @@ begin
    pc := getPixel(0,0);
    lnx := $FFFF;
    tool := 1;
+   contdraw:=false;
    sx := sizex;
    sy := sizey;
 
    {draw the palette}
    drawPal;
+   drawCurrentTool;
    done:=false;
 
    {load the undo buffer with the starting image}
@@ -671,27 +692,31 @@ begin
 
       case c of
 	{ arrow keys and other extended keys}
-	chr(0) : extendedKeys;
+	chr(0)	: extendedKeys;
 	{special functions}
-	'U'    : useUndo;
-	' '    : useTool;
+	'U'	: useUndo;
+	' '     : useTool;
        
 	{Palette and colour selection}
-	'1'    : cc := 0;
-	'2'    : cc := 1;
-	'3'    : cc := 2;
-	'4'    : cc := 3;
-	'5'    : cc := 4;
-	'6'    : cc := 5;
-	'7'    : cc := 6;
-	'8'    : cc := 7;
-	'9'    : cc := 8;
-	'0'    : cc := 9;
-	'P'    : pal[cc] := pickColor;
-	','    : if cc>0 then dec(cc);
-	'.'    : if cc<9 then inc(cc);
-	'G'    : pal[cc] := pc;
+	'1'	: cc := 0;
+	'2'	: cc := 1;
+	'3'	: cc := 2;
+	'4'	: cc := 3;
+	'5'	: cc := 4;
+	'6'	: cc := 5;
+	'7'	: cc := 6;
+	'8'	: cc := 7;
+	'9'	: cc := 8;
+	'0'	: cc := 9;
+	'P'	: pal[cc] := pickColor;
+	','	: if cc>0 then dec(cc);
+	'.'     : if cc<9 then inc(cc);
+	'G'	: pal[cc] := pc;
 
+	chr(13)	: begin
+	   contdraw:= not(contdraw);
+	   drawCurrentTool;
+	end;
 	{Quit options}
 	chr(27),'Q' : begin
 	   r:= exitMenu;
@@ -713,6 +738,8 @@ begin
       end;
       
       pc:= getPixel(x,y);
+      if ((tool=1) and contdraw) then pc := pal[cc];
+      
       putPixel(x,y,15 xor pc);
       line(sx,0,sx,sy,7);
       line(0,sy,sx,sy,7);
@@ -731,6 +758,7 @@ end;
 begin
    sx:=10;
    sy:=10;
+   contdraw:= false;
    for cc := 0 to 9 do
       pal[cc] := cc;
    cc := 0;

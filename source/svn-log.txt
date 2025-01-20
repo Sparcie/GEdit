@@ -1,4 +1,11 @@
 ------------------------------------------------------------------------
+r17 | andrew | 2025-01-20 18:33:00 +1100 (Mon, 20 Jan 2025) | 4 lines
+
+- added a display of the currently used tool
+- added continuous mode for both pixels and lines. Makes some drawing a little easier.
+
+next job will be to create an editor for the graphics pack files (pgs) or palette.
+------------------------------------------------------------------------
 r16 | andrew | 2025-01-19 19:01:14 +1100 (Sun, 19 Jan 2025) | 1 line
 
 - fixed file selector for the instance where there are no files to load.
