@@ -1,4 +1,9 @@
 ------------------------------------------------------------------------
+r18 | andrew | 2025-01-21 21:34:53 +1100 (Tue, 21 Jan 2025) | 2 lines
+
+- moved exit menu to common ui as I'll use that menu for the other functions.
+- started work on the graphics package editor - still need to implement functions such as load/save and editing functions.
+------------------------------------------------------------------------
 r17 | andrew | 2025-01-20 18:33:00 +1100 (Mon, 20 Jan 2025) | 4 lines
 
 - added a display of the currently used tool

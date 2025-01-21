@@ -36,7 +36,12 @@ function fileSelector( ext:string; wr:boolean):string;
 function menu(m : menudata):byte;
 { help display function - allows user to scroll through text }
 procedure help(h : helpdata);
-		    
+{returns 0 for exit menu (resume editng)
+ 1 for exit and save image
+ 2 for exit and discard image
+}
+function exitMenu:byte;
+
 implementation
 
 uses bfont, bsystem, vga, dos, keybrd;
@@ -438,6 +443,24 @@ begin
       textxy(x,y,4,7,s);
    end;
    ginput:=z;
+end;
+
+{returns 0 for exit menu (resume editng)
+ 1 for exit and save image
+ 2 for exit and discard image
+}
+function exitMenu:byte;
+var m : menudata;
+   r  : byte;
+begin
+   m.title := 'Save?';
+   m.items[1] := 'Save and Exit';
+   m.items[2] := 'Discard and Exit';
+   m.items[3] := 'Resume editing';
+   m.count:=3;
+   r:= menu(m);
+   if r=3 then r:=0; {they are the same result}
+   exitMenu:=r;
 end;
 
 end.

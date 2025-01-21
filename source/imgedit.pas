@@ -496,24 +496,6 @@ begin
    end;
 end;
 
-{returns 0 for exit menu (resume editng)
- 1 for exit and save image
- 2 for exit and discard image
-}
-function exitMenu:byte;
-var m : menudata;
-   r  : byte;
-begin
-   m.title := 'Save edited image?';
-   m.items[1] := 'Save and Exit';
-   m.items[2] := 'Discard and Exit';
-   m.items[3] := 'Resume editing';
-   m.count:=3;
-   r:= menu(m);
-   if r=3 then r:=0; {they are the same result}
-   exitMenu:=r;
-end;
-
 procedure imageInfo;
 var
    s,t	   : string;
