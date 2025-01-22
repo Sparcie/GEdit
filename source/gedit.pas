@@ -2,9 +2,7 @@ program gedit;
 {$M 65520,0,655360}
 {$G+}
 
-uses pgs, vga, bfont, commonui, imgedit;
-
-var drawCheck:boolean;
+uses pgs, vga, bfont, commonui, imgedit, pgsedit;
 
 procedure startImgEdit;
 var
@@ -38,6 +36,67 @@ begin
    if save then exportGFX;   
 end;
 
+procedure startPgsEdit;
+var
+   m	 : menudata;
+   r	 : byte;
+   sx,sy : word;
+   ext	 : string[12];
+begin
+   m.title:= 'Package Editor';
+   m.items[1] := 'New Package';
+   m.items[2] := 'Load Package';
+   m.count := 2;
+
+   r:= menu(m);
+
+   if r=1 then
+   begin
+      pickSize(sx,sy);
+      newPackage(sx,sy);
+      editPgs;
+   end;
+   if r=2 then
+   begin
+      ext := pgsedit.selectFileExtension;
+      ext := fileSelector(ext,false);
+      if ext<>'' then
+      begin
+	 pgsedit.loadPackage(ext);
+	 editPgs;
+      end;      
+   end;
+end;
+
+procedure chooseEditor;
+var
+   m	: menuData;
+   r	: byte;
+   done	: boolean;
+begin
+   m.title := 'GEdit';
+   m.items[1] := 'Image Editor';
+   m.items[2] := 'Package Editor';
+   m.items[3] := 'Palette Editor';
+   m.items[4] := 'Exit';
+   m.count := 4;
+
+   done:= false;
+
+   while not(done) do
+   begin
+      cls;
+      r := menu(m);
+
+      case r of
+	1 : startImgEdit;
+	2 : startPgsEdit;
+	{3 not done yet}
+	4 : done := true;
+      end;
+   end;
+end;
+
 begin
    pgs.initvga;
    bfont.loadFont('litt.chr');
@@ -48,7 +107,7 @@ begin
       halt(1);
    end;
    
-   startImgEdit;
+   chooseEditor;
 
    textscreen;
 end.

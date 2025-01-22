@@ -1,4 +1,12 @@
 ------------------------------------------------------------------------
+r19 | andrew | 2025-01-22 19:07:57 +1100 (Wed, 22 Jan 2025) | 5 lines
+
+- added the pgsedit to the main program.
+- implemented saving and loading packages - I made it possible to select the file extension as the same format files
+   have in practise a few different extensions. maybe I should make this consistent in future (pgs for all of them)
+- debugged some of the display and cursor movement code
+- found a stack overflow in imagesPerPage - it was accidentally recursive - fixed.
+------------------------------------------------------------------------
 r18 | andrew | 2025-01-21 21:34:53 +1100 (Tue, 21 Jan 2025) | 2 lines
 
 - moved exit menu to common ui as I'll use that menu for the other functions.

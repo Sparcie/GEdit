@@ -21,6 +21,8 @@ procedure newPackage(sizex, sizey : word);
 procedure loadPackage(pfile : string);
 {edit the package - the ui }
 procedure editPgs;
+{file extension selector for package files }
+function selectFileExtension:string;
 				  
 implementation
 
@@ -28,7 +30,7 @@ uses bfont, vga, commonui, keybrd, imgedit, pgs, gpack;
 
 var
    packageFile : string; {name of the current package file }
-   sx,sy       : word; {image size - each one will occupy this space plus some padding so there can be a border}
+   sx,sy       : integer; {image size - each one will occupy this space plus some padding so there can be a border}
    page	       : byte; { the current display page}
    pos	       : word; { the position of the edit cursor on the current page}
    
@@ -54,11 +56,13 @@ end;
 function imagesPerPage:word;
 var
    pageStart : word;
+   ipp	     : word; {temp storage for the function}
 begin
-   pageStart := (imagesPerPage * page); {always start at 1 otherwise }
-   imagesPerPage := columnsPerPage * rowsPerPage;
-   if (spriteCount - pageStart) < imagesPerPage then
-      ImagesPerPage := spriteCount-pageStart;
+   ipp := (columnsPerPage * rowsPerPage) -1;
+   imagesPerPage := ipp;
+   pageStart := (ipp * page); {always start at 1 otherwise }
+   if (spriteCount - pageStart) < ipp then
+      ImagesPerPage := spriteCount-pageStart -1;
 end;
 
 {simple display functions }
@@ -93,7 +97,7 @@ var
    oldPos    : word; {old cursor location }
    pageStart : word; {first image for this page }
 begin
-   pageStart : word; {first image for this page}
+   pageStart := (imagesPerPage * page) + 1; {always start at 1 otherwise }
    oldPos := pos;
    pos:= newPos;
    drawImg(pageStart+oldPos, oldPos);
@@ -107,6 +111,8 @@ begin
    sy:= sizey;
    pgs.newPack(sx,sy);
    packageFile := '';
+   pos:=0;
+   page:=0;
 end;
 
 {load a package file }
@@ -115,14 +121,119 @@ begin
    packageFile := pfile;
    pgs.loadpack(pfile);
    pgs.spriteSize(sx,sy);
+   pos:=0;
+   page:=0;
+end;
+
+{export the current package using gpack to a file - assumes the file name is already selected }
+procedure savePackage;
+var
+   cx,cy : word; {current location in current image}
+   i	 : word; {current image we're working on }
+   comp	 : word; {count of images that were compressed using RLE }
+   s	 : string;
+   c	 : char;
+begin
+   gpack.newFile(packageFile, pgs.spriteCount, sx, sy);
+
+   {now go through each image - draw it to the screen, and send the data to gpack}
+   for i:= 1 to pgs.spriteCount do
+   begin
+      pgs.draw(0,0,copyput,i);
+      for cy := 0 to sy-1 do
+	 for cx := 0 to sx-1 do
+	    gpack.spriteData(chr(getPixel(cx,cy)));      
+   end;
+
+   {ok now the data is sent to gpack we can close the file...}
+   comp := gpack.closeFile;
+
+   {output the number of compressed images - out of interest!}
+   str(comp,s);
+   s:= 'Compressed : '+s;
+   filledBox(100,35,220,65,8);
+   textxy(110,40,4,9,s);
+   str(pgs.spriteCount, s);
+   s:= 'Total : '+s;
+   textxy(110,50,4,9,s);
+
+   {wait for a keypress}
+   while not(keypressed) do;
+   {read the key input so it doesn't register in editor elsewhere}
+   c:= readkey;
+   if c = chr(0) then c:= readkey;
+end;
+
+function selectFileExtension:string;
+var
+   m : menudata;
+   r : byte;
+begin
+   m.title := 'Select file extension';
+   m.items[1] := 'pgs';
+   m.items[2] := 'lrp';
+   m.items[3] := 'hrp';
+   m.items[4] := 'ega';
+   m.items[5] := 'cga';
+   m.count := 5;
+   r:= menu(m);
+   selectFileExtension := 'pgs';
+   case r of
+     2 : selectFileExtension := 'lrp';
+     3 : selectFileExtension := 'hrp';
+     4 : selectFileExtension := 'ega';
+     5 : selectFileExtension := 'cga';
+   end;
 end;
 
 procedure fileMenu;
+var
+   m   : menudata;
+   r   : byte;
+   ext : string[12];
 begin
-
+   m.title := 'File actions';
+   m.items[1] := 'Save';
+   m.items[2] := 'Save As';
+   m.items[3] := 'Load';
+   m.count := 3;
+   r:= menu(m);
+   case r of
+     1 : if packageFile <> '' then
+	    begin
+	       savePackage;
+	       cls;
+	       drawPage;
+	    end
+         else
+	    begin
+	       ext := selectFileExtension;
+	       packageFile := fileSelector(ext, true);
+	       if packageFile <> '' then savePackage;
+	       cls;
+	       drawPage;
+	    end;
+     2 : begin
+	    ext := selectFileExtension;
+	    packageFile := fileSelector(ext,true);
+	    if packageFile <> '' then savePackage;
+	    cls;
+	    drawPage;
+	 end;
+     3 : begin
+	    ext := selectFileExtension;
+	    ext := fileSelector(ext,false);
+	    if ext <> '' then loadPackage(ext);
+	    cls;
+	    drawPage;
+	 end;
+   end;
 end;
 
 procedure actionMenu;
+var
+   m : menudata;
+   r : byte;
 begin
 
 end;
@@ -133,10 +244,10 @@ var
 begin
    c:= readkey;
    case c of
-     chr(72) : 	if pos>columnsPerPage then updateCursor(pos - columnsPerPage);
-     chr(80) : if pos<imagesPerPage-columnsPerPage then updateCursor(pos + columnsPerPage);
-     chr(75) : if pos>1 then updateCursor(pos-1);
-     chr(77) : if pos<imagesPerPage then updateCursor(pos+1);
+     chr(72) : 	if pos>=columnsPerPage then updateCursor(pos - columnsPerPage);
+     chr(80) : if pos< (int(imagesPerPage)-columnsPerPage)+1 then updateCursor(pos + columnsPerPage);
+     chr(75) : if pos>0 then updateCursor(pos-1);
+     chr(77) : if pos<(imagesPerPage) then updateCursor(pos+1);
      chr(60) : fileMenu;
      chr(61) : actionMenu;
    end;
@@ -148,9 +259,11 @@ var
    done	: boolean;
    c	: char;
    r	: byte;
+   ext	: string[12];
 begin
    page:= 0;
    pos:=0;
+   done := false;
 
    {initialise the display}
    cls;
@@ -166,8 +279,15 @@ begin
 	   r := exitMenu;
 	   if r = 1 then
 	   begin {save and exit}
-		 {------ insert save routine here -----}
 	      done:=true;
+	      if packageFile <> '' then
+		 savePackage
+	      else
+	      begin
+		 ext := selectFileExtension;
+		 packageFile := fileSelector(ext, true);
+		 if packageFile <> '' then savePackage else done:=false;
+	      end;
 	   end;
 	   if r=2 then
 	   begin {discard and exit}
