@@ -56,13 +56,15 @@ end;
 function imagesPerPage:word;
 var
    pageStart : word;
+   pageEnd   : word;
    ipp	     : word; {temp storage for the function}
 begin
-   ipp := (columnsPerPage * rowsPerPage) -1;
-   imagesPerPage := ipp;
+   ipp := (columnsPerPage * rowsPerPage) ;
+   imagesPerPage := ipp - 1;
    pageStart := (ipp * page); {always start at 1 otherwise }
-   if (spriteCount - pageStart) < ipp then
-      ImagesPerPage := spriteCount-pageStart -1;
+   pageEnd := pageStart+ipp;
+   if pageEnd > spriteCount then
+      ImagesPerPage := spriteCount - pageStart -1;
 end;
 
 {simple display functions }
@@ -86,7 +88,8 @@ var
    pageStart : word; {first image for this page}
    i	     : word; {loop counter}
 begin
-   pageStart := (imagesPerPage * page) + 1; {always start at 1 otherwise }
+   cls;
+   pageStart := (columnsPerPage * rowsPerPage * page) + 1; {always start at 1 otherwise }
    for i:= 0 to imagesPerPage do
       drawImg(pageStart+i, i); 
 end;
@@ -97,7 +100,7 @@ var
    oldPos    : word; {old cursor location }
    pageStart : word; {first image for this page }
 begin
-   pageStart := (imagesPerPage * page) + 1; {always start at 1 otherwise }
+   pageStart := (columnsPerPage * rowsPerPage * page) + 1; {always start at 1 otherwise }
    oldPos := pos;
    pos:= newPos;
    drawImg(pageStart+oldPos, oldPos);
@@ -107,6 +110,7 @@ end;
 {start a new package file}
 procedure newPackage(sizex, sizey : word);
 begin
+   pgs.unloadpack;
    sx:= sizex;
    sy:= sizey;
    pgs.newPack(sx,sy);
@@ -118,6 +122,7 @@ end;
 {load a package file }
 procedure loadPackage(pfile : string);
 begin
+   pgs.unloadpack;
    packageFile := pfile;
    pgs.loadpack(pfile);
    pgs.spriteSize(sx,sy);
@@ -202,7 +207,6 @@ begin
      1 : if packageFile <> '' then
 	    begin
 	       savePackage;
-	       cls;
 	       drawPage;
 	    end
          else
@@ -210,21 +214,18 @@ begin
 	       ext := selectFileExtension;
 	       packageFile := fileSelector(ext, true);
 	       if packageFile <> '' then savePackage;
-	       cls;
 	       drawPage;
 	    end;
      2 : begin
 	    ext := selectFileExtension;
 	    packageFile := fileSelector(ext,true);
 	    if packageFile <> '' then savePackage;
-	    cls;
 	    drawPage;
 	 end;
      3 : begin
 	    ext := selectFileExtension;
 	    ext := fileSelector(ext,false);
 	    if ext <> '' then loadPackage(ext);
-	    cls;
 	    drawPage;
 	 end;
    end;
@@ -232,10 +233,88 @@ end;
 
 procedure actionMenu;
 var
-   m : menudata;
-   r : byte;
+   m	     : menudata;
+   r	     : byte;
+   pageStart : word;
+   save	     : boolean;
 begin
+   pageStart := (columnsPerPage * rowsPerPage * page) + 1;
+   m.title := 'Choose an action';
+   m.items[1] := 'Insert after';
+   m.items[2] := 'Delete';
+   m.items[3] := 'Duplicate';
+   m.items[4] := 'Edit';
+   m.count := 4;
 
+   r:= menu(m);
+
+   case r of
+     1 : pgs.insert(pos+pageStart);
+     2 : pgs.remove(pos+pageStart);
+     3 : begin {duplicate an image}
+	    pgs.insert(pos+pageStart);
+	    pgs.draw(0,0,copyput,pos+pageStart);
+	    replace(0,0,pos+pageStart+1);
+	 end;
+     4 : begin
+	    cls;
+	    pgs.draw(0,0,copyput,pos+pagestart);
+	    save := editImg(sx,sy);
+	    if save then
+	       replace(0,0,pos+pagestart);
+	 end;
+   end;
+   drawPage;
+end;
+
+procedure pgsInfo;
+var
+   pageStart : word;
+   s,t	     : string;
+   c	     : char;
+   i,count   : byte;
+   
+begin
+   copyToBuffer;
+
+   filledbox(70,0,270,199,0);
+   line(70,0,70,199,7);
+   line(270,0,270,199,7);
+
+   pageStart := (columnsPerPage * rowsPerPage * page) + 1;
+   str(pageStart + pos,s);
+   t:= 'Image :'+s;
+   textxy(80,20,4,9,t);
+   
+   str(sx,s);
+   t:= 'Image size : '+s+' x ';
+   str(sy,s);
+   t:= t + s;
+   str(imageSize(sx,sy),s);
+   t:= t + ' ' + s + ' Bytes';
+   textxy(80,30,4,9,t);
+
+   str( (imageSize(sx,sy) * spriteCount) div 1024, s);
+   t:= 'Memory for package: '+s+'K';
+   textxy(80,40,4,9,t);
+   
+   
+   t:='Available memory :';
+   str(memavail,s);
+   t:= t +s;
+   textxy(80,100,4,9,t);
+
+   t:='Largest block :';
+   str(maxavail,s);
+   t:=t+s;
+   textxy(80,110,4,9,t);
+
+   while not(keypressed) do;
+
+   c:= readkey;
+   if c = chr(0) then c:= readkey;
+
+   copyToScreen;
 end;
 
 procedure extendedKeys;
@@ -244,12 +323,25 @@ var
 begin
    c:= readkey;
    case c of
-     chr(72) : 	if pos>=columnsPerPage then updateCursor(pos - columnsPerPage);
+     chr(72) : if pos>=columnsPerPage then updateCursor(pos - columnsPerPage);
      chr(80) : if pos< (int(imagesPerPage)-columnsPerPage)+1 then updateCursor(pos + columnsPerPage);
      chr(75) : if pos>0 then updateCursor(pos-1);
      chr(77) : if pos<(imagesPerPage) then updateCursor(pos+1);
      chr(60) : fileMenu;
      chr(61) : actionMenu;
+     chr(62) : pgsInfo;
+     chr(81) : if (page < (spriteCount div (rowsPerPage * columnsPerPage)) ) then
+        begin
+	   inc(page);
+	   pos:=0;
+	   drawPage;
+	end;
+     chr(73) : if page>0 then
+	begin
+	   dec(page);
+	   pos:=0;
+	   drawPage;
+	end;
    end;
 end;
 
@@ -266,7 +358,6 @@ begin
    done := false;
 
    {initialise the display}
-   cls;
    drawPage;
 
    while not(done) do
@@ -291,14 +382,13 @@ begin
 	   end;
 	   if r=2 then
 	   begin {discard and exit}
-	      unloadpack;
 	      done:=true;
 	   end;
 	end;
 	chr(0)	: extendedKeys;
       end;
-   end; 
-
+   end;
+   pgs.unloadpack;
 end;
 
 begin

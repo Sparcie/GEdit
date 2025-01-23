@@ -1,4 +1,13 @@
 ------------------------------------------------------------------------
+r20 | andrew | 2025-01-23 17:07:54 +1100 (Thu, 23 Jan 2025) | 6 lines
+
+- added page up/down and basic editing functions for the package editor
+- added an information screen for the package editor
+- fixed some of the paging mechanism (again) seems to work now
+
+Some testing of the package editor and it should be done
+Need to do palette editor and create help system.
+------------------------------------------------------------------------
 r19 | andrew | 2025-01-22 19:07:57 +1100 (Wed, 22 Jan 2025) | 5 lines
 
 - added the pgsedit to the main program.
