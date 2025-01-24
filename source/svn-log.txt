@@ -1,4 +1,8 @@
 ------------------------------------------------------------------------
+r21 | andrew | 2025-01-24 16:39:44 +1100 (Fri, 24 Jan 2025) | 1 line
+
+- re written some aspects of the palette unit and added some code for loading/saving a palette.
+------------------------------------------------------------------------
 r20 | andrew | 2025-01-23 17:07:54 +1100 (Thu, 23 Jan 2025) | 6 lines
 
 - added page up/down and basic editing functions for the package editor

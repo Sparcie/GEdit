@@ -9,11 +9,40 @@ procedure SetColor(number, r,g,b: byte);
 procedure GetColor(number: byte; var r,g,b: byte);
 procedure SetPalette(pal: paltype);
 procedure GetPalette(var pal: paltype);
-function  StepPalette(var p: paltype; pal: paltype): boolean;
+function  StepPalette( pal: paltype): boolean;
+
+procedure savePalette(p : paltype; palfile: string);
+procedure loadPalette(var p :paltype; palfile : string);
 
 implementation
 
-procedure SetColor;
+uses buffer;
+
+procedure savePalette(p : paltype; palfile: string);
+var
+   i ,c	: word; {loop counters}
+   wr	: writer; {file writer with buffer}
+begin
+   wr.open(palfile);
+   for i:= 0 to 255 do
+      for c:= 0 to 2 do
+	 wr.writeChar(chr(p[i,c]));
+   wr.close;
+end;
+
+procedure loadPalette(var p :paltype; palfile : string);
+var
+   i,c	  : word; {loop counters}
+   re	  : reader; { buffered file reader }
+begin
+   re.open(palfile);
+   for i:=0 to 255 do
+      for c:= 0 to 2 do
+	 p[i,c] := ord(re.readchar);
+   re.close;
+end;
+
+procedure SetColor(number, r,g,b: byte);
 begin
    port[$3c8]:=number;
    port[$3c9]:=r;
@@ -21,7 +50,7 @@ begin
    port[$3c9]:=b;
 end;
 
-procedure GetColor;
+procedure GetColor(number: byte; var r,g,b: byte);
 begin
    port[$3c7]:=number;
    r:=port[$3c9];
@@ -29,21 +58,25 @@ begin
    b:=port[$3c9];
 end;
 
-procedure SetPalette;
+procedure SetPalette(pal: paltype);
 var i: integer;
 begin
    for i:=0 to 255 do SetColor(i,pal[i,0],pal[i,1],pal[i,2]);
 end;
 
-procedure GetPalette;
+procedure GetPalette(var pal: paltype);
 var i: integer;
 begin
    for i:=0 to 255 do GetColor(i,pal[i,0],pal[i,1],pal[i,2]);
 end;
 
-function StepPalette(var p: paltype; pal: paltype): boolean;
-var i: integer; b: boolean;
+function StepPalette( pal: paltype): boolean;
+var
+   i : integer;
+   b : boolean;
+   p : paltype;   
 begin
+   getPalette(p);
    b:=false;
    for i:=0 to 255 do
    begin
@@ -55,6 +88,7 @@ begin
       if p[i,2]>pal[i,2] then begin dec(p[i,2]); b:=true; end;
    end;
    StepPalette:=b;
+   setPalette(p);
 end;
 
 end.
