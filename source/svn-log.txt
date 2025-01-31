@@ -1,4 +1,11 @@
 ------------------------------------------------------------------------
+r22 | andrew | 2025-01-31 16:57:37 +1100 (Fri, 31 Jan 2025) | 4 lines
+
+- added key to manually add an entry to the undo buffer
+- started work on the palette module. It will allow you to use a number of standard palettes 
+  (EGA/VGA and a number of CGA options) Which will allow you to work with CGA graphics/packs.
+  Also allows you to load a custom palette from disk, but I haven't made the editor yet.
+------------------------------------------------------------------------
 r21 | andrew | 2025-01-24 16:39:44 +1100 (Fri, 24 Jan 2025) | 1 line
 
 - re written some aspects of the palette unit and added some code for loading/saving a palette.

@@ -674,9 +674,10 @@ begin
 
       case c of
 	{ arrow keys and other extended keys}
-	chr(0)	: extendedKeys;
+	chr(0)  : extendedKeys;
 	{special functions}
-	'U'	: useUndo;
+	'U'     : useUndo;
+	'M'     : refreshUndo; {manually add state to undo}
 	' '     : useTool;
        
 	{Palette and colour selection}

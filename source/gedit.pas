@@ -2,7 +2,7 @@ program gedit;
 {$M 65520,0,655360}
 {$G+}
 
-uses pgs, vga, bfont, commonui, imgedit, pgsedit;
+uses pgs, vga, bfont, commonui, imgedit, pgsedit, paledit;
 
 procedure startImgEdit;
 var
@@ -68,6 +68,26 @@ begin
    end;
 end;
 
+procedure startPalEdit;
+var
+   m : menuData;
+   r : byte;
+begin
+   m.title := 'Palette';
+   m.items[1] := 'Select Std Palette';
+   m.items[2] := 'Load pal from file';
+   m.items[3] := 'Edit Palette';
+   m.count := 3;
+
+   r:= menu(m);
+
+   case r of
+     1 : standardPal;
+     2 : loadCustomPal;
+     3 : editPal;
+   end;   
+end;
+
 procedure chooseEditor;
 var
    m	: menuData;
@@ -77,7 +97,7 @@ begin
    m.title := 'GEdit';
    m.items[1] := 'Image Editor';
    m.items[2] := 'Package Editor';
-   m.items[3] := 'Palette Editor';
+   m.items[3] := 'Palette';
    m.items[4] := 'Exit';
    m.count := 4;
 
@@ -91,7 +111,7 @@ begin
       case r of
 	1 : startImgEdit;
 	2 : startPgsEdit;
-	{3 not done yet}
+	3 : startPalEdit;
 	4 : done := true;
       end;
    end;
