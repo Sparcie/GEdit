@@ -1,4 +1,12 @@
 ------------------------------------------------------------------------
+r23 | andrew | 2025-02-15 13:12:42 +1100 (Sat, 15 Feb 2025) | 5 lines
+
+Wrote the palette editor - which is fairly simple compared to the others.
+
+The last task for gedit is to add the online help. I intend on having the F1 key bring up a help screen within all the
+editors. So if you don't know how to use it (or have forgotten) you can get a list of keyboard controls without having to
+resort to reading a readme or source code.
+------------------------------------------------------------------------
 r22 | andrew | 2025-01-31 16:57:37 +1100 (Fri, 31 Jan 2025) | 4 lines
 
 - added key to manually add an entry to the undo buffer

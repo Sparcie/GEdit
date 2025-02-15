@@ -92,8 +92,157 @@ end;
 { editor that will modify the current palette
    has options to save/load and modify the colours }
 procedure editPal;
+var
+   i	 : word; {counter for loops}
+   cc	 : byte; { the current colour we are modifying }
+   ch	 : byte; { the channel we are modifying R G B }
+   m	 : byte; { menu result }
+   r,g,b : byte; { colour channels for the current colour }
+   c	 : char; { current keyboard input }
+   s	 : string; {string for working with text to display}
+   done	 : boolean; {are we finished with the editor }
+   p	 : paltype; { data storage for palette when we save it }
 begin
+   cls;
+   {display the range of colours at the top of the screen }
+   for i:= 0 to 255 do
+      line(i,0,i,15,i);
 
+   cc := 0; { set initial state }
+   ch := 0;
+   done := false;
+
+   while not(done) do
+   begin
+      {get initial colour channel values }
+      getColor(cc, r,g,b);
+
+      {display the current state }
+      line(cc,16,cc,25,9); {colour cursor }
+
+      { display the current colour }
+      filledbox(10,30,20,40,cc); 
+      str(cc,s);
+      s := 'Colour :'+s;
+      textxy(30,30,4,9,s);
+
+      {display the channel values and channel cursor}
+      line(0,45 + (ch*10),10, 45 + (ch*10),9);
+      str(r,s);
+      s:= 'Red :'+s;
+      textxy(20,40,4,9,s);
+      str(g,s);
+      s:= 'Green :'+s;
+      textxy(20,50,4,9,s);
+      str(b,s);
+      s:= 'Blue :'+s;
+      textxy(20,60,4,9,s);
+
+      { wait for a keypress }
+      while not(keypressed) do;
+
+      {clear the current state }
+      line(cc,16,cc,25,0); {colour cursor }
+
+      { display the current colour }
+      str(cc,s);
+      s := 'Colour :'+s;
+      textxy(30,30,4,0,s);
+
+      {display the channel values and channel cursor}
+      line(0,45 + (ch*10),10, 45 + (ch*10),0);
+      str(r,s);
+      s:= 'Red :'+s;
+      textxy(20,40,4,0,s);
+      str(g,s);
+      s:= 'Green :'+s;
+      textxy(20,50,4,0,s);
+      str(b,s);
+      s:= 'Blue :'+s;
+      textxy(20,60,4,0,s);
+
+      { ok now read a key and update any values }
+      c:= readkey;
+      
+      case c of
+	',','<'	: begin
+	   case ch of
+	     0 : begin
+		    dec(r);
+		    if r>63 then r:= 63;
+		 end;
+	     1 : begin
+		    dec(g);
+		    if g>63 then g:=63;
+		 end;
+	     2 : begin
+		    dec(b);
+		    if b>63 then b:=63;
+		 end;
+	   end;
+	   setColor(cc,r,g,b);
+	end;
+	'.','>'	: begin
+	   case ch of
+	     0	: begin
+		    inc(r);
+		    if r>63 then r:= 0;
+		 end;
+	     1	: begin
+		    inc(g);
+		    if g>63 then g:=0;
+		 end;
+	     2	: begin
+		    inc(b);
+		    if b>63 then b:=0;
+		 end;
+	   end;
+	   setColor(cc,r,g,b);
+	end;
+	chr(27)	: begin
+	   {quiting the editor }
+	   m := exitMenu;
+	   case m of
+	     1 : begin
+		    s := fileSelector('pal',true);
+		    if not(s = '') then
+		    begin
+		       getPalette(p);
+		       savePalette(p,s);
+		       done:=true;
+		    end;
+		 end;
+	     2 : done := true;
+	   end;
+	end;
+	chr(0) : begin
+	   { extended keys! }
+	   c := readkey;
+
+	   case c of
+	     chr(60) : begin
+		s := fileSelector('pal',true);
+		if not(s = '') then
+		begin
+		   getPalette(p);
+		   savePalette(p,s);
+		end;	       
+	     end;
+	     chr(61) : loadCustomPal;
+	     chr(72) : begin
+		dec(ch);
+		if ch>2 then ch:=2;
+	     end;
+	     chr(80) : begin
+		inc(ch);
+		if ch=3 then ch:=0;
+	     end;
+	     chr(75) : dec(cc);
+	     chr(77) : inc(cc);
+	   end;
+	end;
+      end;
+   end;
 end;
 
 end.
