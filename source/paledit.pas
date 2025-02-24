@@ -28,7 +28,7 @@ procedure editPal;
 
 implementation
 
-uses commonui, vga, bfont, keybrd, vgapal;
+uses commonui, vga, bfont, keybrd, vgapal, help;
 
 { a menu to choose and load one of the standard palettes
   contains VGA and CGA choices }
@@ -220,6 +220,7 @@ begin
 	   c := readkey;
 
 	   case c of
+	     chr(59) : palHelp;
 	     chr(60) : begin
 		s := fileSelector('pal',true);
 		if not(s = '') then

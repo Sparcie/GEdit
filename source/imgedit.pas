@@ -27,7 +27,7 @@ procedure getSize(var sizex, sizey : word);
 
 implementation
 
-uses commonui, vga, bfont, buffer, keybrd, gcommon;
+uses commonui, vga, bfont, buffer, keybrd, gcommon, help;
 
 var
    sx, sy   : word; {the size of the image we are currently editing }
@@ -629,6 +629,7 @@ begin
      chr(80) : if y<sy-1 then inc(y);
      chr(75) : if x>0 then dec(x);
      chr(77) : if x<sx-1 then inc(x);
+     chr(59) : imgHelp;
      chr(60) : specialFunctionMenu;
      chr(61) : selectTool;
    end;

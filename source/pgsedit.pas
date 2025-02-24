@@ -26,7 +26,7 @@ function selectFileExtension:string;
 				  
 implementation
 
-uses bfont, vga, commonui, keybrd, imgedit, pgs, gpack;
+uses bfont, vga, commonui, keybrd, imgedit, pgs, gpack, help;
 
 var
    packageFile : string; {name of the current package file }
@@ -327,6 +327,7 @@ begin
      chr(80) : if pos< (int(imagesPerPage)-columnsPerPage)+1 then updateCursor(pos + columnsPerPage);
      chr(75) : if pos>0 then updateCursor(pos-1);
      chr(77) : if pos<(imagesPerPage) then updateCursor(pos+1);
+     chr(59) : pgsHelp;
      chr(60) : fileMenu;
      chr(61) : actionMenu;
      chr(62) : pgsInfo;

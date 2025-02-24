@@ -100,8 +100,16 @@ begin
 	 begin
 	    c:= readkey;
 
-	    if ((c = chr(72)) and (selection > 1)) then dec(selection);
-	    if ((c = chr(80)) and (selection < count)) then inc(selection);	    
+	    if (c= chr(72)) then
+	       if (selection > 1) then
+		  dec(selection)
+	       else
+		  selection := count;
+	    if (c=chr(80)) then
+	       if (selection < count) then
+		  inc(selection)
+	       else
+		  selection := 1;	    	    
 	 end;	 
       end;
    end;
@@ -121,6 +129,7 @@ begin
    copyToBuffer;
    page := 1;
    new := true;
+   done := false;
    with h do
       while not(done) do
       begin

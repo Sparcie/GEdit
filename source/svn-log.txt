@@ -1,4 +1,14 @@
 ------------------------------------------------------------------------
+r24 | andrew | 2025-02-24 23:02:36 +1100 (Mon, 24 Feb 2025) | 7 lines
+
+ - changed menu to allow the cursor to wrap-around the top/bottom
+ - Added new help unit to contain the online help
+ - Added help functions to each editor
+ - fixed general help function - didn't initialise done variable.
+
+The help is fairly basic at the moment, with each basically having a key reference and nothing more.
+I'm considering writing some more detailed information.
+------------------------------------------------------------------------
 r23 | andrew | 2025-02-15 13:12:42 +1100 (Sat, 15 Feb 2025) | 5 lines
 
 Wrote the palette editor - which is fairly simple compared to the others.
