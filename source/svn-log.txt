@@ -1,4 +1,10 @@
 ------------------------------------------------------------------------
+r25 | andrew | 2025-05-25 16:59:51 +1000 (Sun, 25 May 2025) | 3 lines
+
+Added the ability to draw text into images. Only uses the default font and size, uses the current palette colour.
+
+Maybe in future I can add the ability to use different sizes/fonts. Although that might be challenging with the current bfont unit as it only loads a single font and doesn't do many different sizes.
+------------------------------------------------------------------------
 r24 | andrew | 2025-02-24 23:02:36 +1100 (Mon, 24 Feb 2025) | 7 lines
 
  - changed menu to allow the cursor to wrap-around the top/bottom

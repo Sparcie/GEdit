@@ -43,7 +43,7 @@ var
    lnx,lny  : word; {co-ordinate for line drawing - x is set to $FFFF if first co-ordinate has not been selected}
 
 const
-   toolName: array[1..4] of string[10] = ('Pixel', 'Line', 'Circle', 'Fill');
+   toolName: array[1..5] of string[10] = ('Pixel', 'Line', 'Circle', 'Fill', 'Text');
 
 {get the size of the current image}
 procedure getSize(var sizex, sizey : word);
@@ -576,7 +576,7 @@ var
    r : byte;
 begin
    m.title := 'Select tool';
-   for r := 1 to 4 do
+   for r := 1 to 5 do
       m.items[r] := toolName[r];
    m.count := r;
 
@@ -587,6 +587,8 @@ begin
 end;
 
 procedure useTool;
+var
+   s : string;
 begin
    case tool of
      1 : begin
@@ -615,6 +617,14 @@ begin
      4 : begin
 	    refreshUndo;
 	    recursiveFill(x,y,pal[cc],getpixel(x,y),1);
+	 end;
+     5 : begin
+	    refreshUndo;
+	    copyToBuffer;
+	    textxy(0,170,4,9,'Enter Text');
+	    s := ginput(0,180);
+	    copyToScreen;
+	    textxy(x,y,4,pal[cc],s);
 	 end;
    end;	
 end;
