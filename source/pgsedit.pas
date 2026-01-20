@@ -156,11 +156,14 @@ begin
    {output the number of compressed images - out of interest!}
    str(comp,s);
    s:= 'Compressed : '+s;
-   filledBox(100,35,220,65,8);
+   filledBox(100,35,220,75,8);
    textxy(110,40,4,9,s);
+   str(monoCount,s);
+   s:= 'Monochrome : '+s;
+   textxy(110,50,4,9,s);
    str(pgs.spriteCount, s);
    s:= 'Total : '+s;
-   textxy(110,50,4,9,s);
+   textxy(110,60,4,9,s);
 
    {wait for a keypress}
    while not(keypressed) do;

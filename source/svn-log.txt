@@ -1,4 +1,18 @@
 ------------------------------------------------------------------------
+r26 | andrew | 2026-01-20 00:45:58 +1100 (Tue, 20 Jan 2026) | 11 lines
+
+Added Monochrome encoding for images in the PGS file format.
+
+The main reason for this is I am hoping to soon develop code for using Hercules graphics cards. The other encodings
+(RLE and raw 1 byte per pixel) are inefficient for monochrome data on disk.
+
+The new encoding basically does 1 bit per pixel packed together. A colour value is also stored so the mono image
+can be drawn on screen in the correct colour. This turns out to be a useful encoding for some sprites in Bob's Fury which
+are black and a single colour, so the encoding can be useful in colour graphics data as well.
+
+I'll need to add the decoder to the pgs in Bob's Fury. The encoding and decoding both have been tested (as working)
+within Gedit and the associated tools.
+------------------------------------------------------------------------
 r25 | andrew | 2025-05-25 16:59:51 +1000 (Sun, 25 May 2025) | 3 lines
 
 Added the ability to draw text into images. Only uses the default font and size, uses the current palette colour.

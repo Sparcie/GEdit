@@ -71,4 +71,6 @@ begin
    writeln('Sprites - '+s);
    str(i,s);
    writeln('Compressed - '+s);
+   str(monoCount,s);
+   writeln('Monochrome - '+s);
 end.

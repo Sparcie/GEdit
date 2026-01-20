@@ -355,4 +355,6 @@ begin
    num := closeFile;
    str(num,s);
    writeln('Compressed - '+s+' sprites');
+   str(monoCount,s);
+   writeln('Monochrome - '+s+' sprites');
 end.
