@@ -1,4 +1,21 @@
 ------------------------------------------------------------------------
+r28 | andrew | 2026-01-21 22:21:14 +1100 (Wed, 21 Jan 2026) | 4 lines
+
+I changed the dithering mechanism a little, which slightly improves the output.
+Also filled in the blank lines with data from the previous row (with dithering reversed)
+
+Not perfect but a better result than the first time around.
+------------------------------------------------------------------------
+r27 | andrew | 2026-01-21 22:06:21 +1100 (Wed, 21 Jan 2026) | 7 lines
+
+Created a basic CGA to Hercules graphics converter. It follows the convention most developers
+seem to use when automatically generating Hercules graphics from usually CGA graphics data.
+
+Unlike the other tools the output is not expected to be used in games, but rather serve as 
+a starting point for creating better Hercules graphics for the project and as programmer art
+
+I am considering modifying every second line of output for better dithering.
+------------------------------------------------------------------------
 r26 | andrew | 2026-01-20 00:45:58 +1100 (Tue, 20 Jan 2026) | 11 lines
 
 Added Monochrome encoding for images in the PGS file format.
